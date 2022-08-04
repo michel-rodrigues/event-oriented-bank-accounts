@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "bank-accounts"
+version = "1.0.0"
+description = ""
+authors = []
+
+[tool.poetry.dependencies]
+python = "^3.10.4"
+fastapi = "^0.79.0"
+uvicorn = "^0.18.2"
+
+[tool.poetry.dev-dependencies]
+pre-commit = "^2.20.0"
+pytest = "^7.1.2"
+flake8 = "4.0.1"
+pytest-asyncio = "^0.19.0"
+httpx = "^0.23.0"
+isort = "^5.10.1"
+blue = "^0.9.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 120
+skip = [".gitignore", ".env", "Makefile", "Dockerfile", ".flake8"]
+extend_skip = [".tf", ".md", ".json", ".yaml", ".ini", ".lock", ".local", ".toml"]
+lines_after_imports = 2
+
+[tool.blue]
+line-length = 120
