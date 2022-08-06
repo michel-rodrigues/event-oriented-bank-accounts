@@ -73,7 +73,7 @@ class Aggregate:
             domain event object attributes.
             """
             # Copy the event attributes.
-            kwargs = self.__dict__.copy()
+            kwargs = vars(self).copy()
             # Separate the id and version.
             id = kwargs.pop('originator_id')
             version = kwargs.pop('originator_version')
