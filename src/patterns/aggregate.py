@@ -28,8 +28,8 @@ class Aggregate:
             self.apply(obj)
             return obj
 
-    def apply(self, obj) -> None:
-        pass
+        def apply(self, obj) -> None:
+            pass
 
     class VersionError(Exception):
         pass
