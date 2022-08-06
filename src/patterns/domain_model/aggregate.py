@@ -1,8 +1,9 @@
 import importlib
 import uuid
+from copy import deepcopy
 from datetime import datetime
 
-from src.patterns.domain_event import DomainEvent
+from src.patterns.domain_model.domain_event import DomainEvent
 
 
 class Aggregate:
@@ -73,7 +74,7 @@ class Aggregate:
             domain event object attributes.
             """
             # Copy the event attributes.
-            kwargs = vars(self).copy()
+            kwargs = deepcopy(vars(self))
             # Separate the id and version.
             id = kwargs.pop('originator_id')
             version = kwargs.pop('originator_version')

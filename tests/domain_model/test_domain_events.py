@@ -4,7 +4,7 @@ from datetime import datetime
 
 import pytest
 
-from src.domain.events import AccountClosed, AccountOpened, FullNameUpdated
+from src.domain_model.domain_events import AccountClosed, AccountOpened, FullNameUpdated
 
 
 ORIGINATOR_ID = uuid.uuid4()

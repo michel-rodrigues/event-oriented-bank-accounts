@@ -4,7 +4,7 @@ from decimal import Decimal
 
 import pytest
 
-from src.domain.aggregate import AccountClosedError, BankAccount, InsufficientFundsError
+from src.domain_model.aggregate import AccountClosedError, BankAccount, InsufficientFundsError
 
 
 def test_open_a_bank_account():
@@ -25,7 +25,7 @@ def test_open_a_bank_account_should_emit_an_opened_event():
     assert opened_event.email_address == 'alice@example.com'
     assert opened_event.full_name == 'Alice'
     assert opened_event.originator_version == 1
-    assert opened_event.originator_topic == 'src.domain.aggregate#BankAccount'
+    assert opened_event.originator_topic == 'src.domain_model.aggregate#BankAccount'
     assert isinstance(opened_event.originator_id, uuid.UUID)
     assert isinstance(opened_event.timestamp, datetime)
 

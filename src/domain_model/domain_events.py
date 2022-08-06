@@ -1,4 +1,4 @@
-from src.patterns import DomainEvent
+from src.patterns.domain_model import DomainEvent
 
 
 class AccountOpened(DomainEvent):

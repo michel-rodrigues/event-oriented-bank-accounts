@@ -8,6 +8,7 @@ authors = []
 python = "^3.10.4"
 fastapi = "^0.79.0"
 uvicorn = "^0.18.2"
+cryptography = "^37.0.4"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.20.0"
