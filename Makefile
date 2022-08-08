@@ -46,3 +46,11 @@ build-image: poetry-export
 
 run-docker: build-image
 	@docker run --rm -p '8080:8080' bank-accounts:latest
+
+setup-db:
+	@docker run -d --rm \
+		--name bank-accounts \
+		-e POSTGRES_PASSWORD=postgres \
+		-e POSTGRES_USER=postgres \
+		-e POSTGRES_DB=postgres \
+		-p 5432:5432 postgres:13-alpine
