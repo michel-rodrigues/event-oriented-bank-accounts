@@ -8,33 +8,33 @@ from src.domain_model.mapper.cipher import SECRET_KEY, Cipher
 from src.patterns.domain_model.mapper import Mapper, StoredEvent
 
 
-def test_map_domain_event_to_store_event(json_transcoder):
-    domain_event = BankAccount.TransactionAppended(
+def test_map_event_to_store_event(json_transcoder):
+    event = BankAccount.TransactionAppended(
         originator_id=uuid.uuid4(), originator_version=1, timestamp=datetime.now(), amount=Decimal('10.00')
     )
     mapper = Mapper(transcoder=json_transcoder)
-    stored_event = mapper.from_domain_event(domain_event)
+    stored_event = mapper.from_event(event)
     assert isinstance(stored_event, StoredEvent)
 
 
-def test_map_store_event_to_domain_event(json_transcoder):
-    original_domain_event = BankAccount.TransactionAppended(
+def test_map_store_event_to_event(json_transcoder):
+    original_event = BankAccount.TransactionAppended(
         amount=Decimal('10.00'),
         originator_id=uuid.uuid4(),
         originator_version=1,
         timestamp=datetime.now(),
     )
     mapper = Mapper(transcoder=json_transcoder)
-    stored_event = mapper.from_domain_event(original_domain_event)
-    domain_event: BankAccount.TransactionAppended = mapper.to_domain_event(stored_event)
-    assert domain_event.amount == original_domain_event.amount
-    assert domain_event.timestamp == original_domain_event.timestamp
-    assert domain_event.originator_id == original_domain_event.originator_id
-    assert domain_event.originator_version == original_domain_event.originator_version
+    stored_event = mapper.from_event(original_event)
+    event: BankAccount.TransactionAppended = mapper.to_event(stored_event)
+    assert event.amount == original_event.amount
+    assert event.timestamp == original_event.timestamp
+    assert event.originator_id == original_event.originator_id
+    assert event.originator_version == original_event.originator_version
 
 
 def test_when_cipher_is_provided_it_should_encrypt_the_state_on_store_event(json_transcoder):
-    domain_event = BankAccount.Opened(
+    event = BankAccount.Opened(
         full_name='Steve Magal',
         email_address='steve.magal@irmaodojorel.com',
         originator_id=uuid.uuid4(),
@@ -43,7 +43,7 @@ def test_when_cipher_is_provided_it_should_encrypt_the_state_on_store_event(json
         timestamp=datetime.now(),
     )
     mapper = Mapper(cipher=Cipher(SECRET_KEY), transcoder=json_transcoder)
-    stored_event = mapper.from_domain_event(domain_event)
+    stored_event = mapper.from_event(event)
     assert b'full_name' not in stored_event.state
     assert b'Steve Magal' not in stored_event.state
     assert b'email_address' not in stored_event.state
@@ -51,7 +51,7 @@ def test_when_cipher_is_provided_it_should_encrypt_the_state_on_store_event(json
 
 
 def test_when_cipher_is_provided_it_should_decrypt_the_state_on_store_event(json_transcoder):
-    original_domain_event = BankAccount.Opened(
+    original_event = BankAccount.Opened(
         full_name='Steve Magal',
         email_address='steve.magal@irmaodojorel.com',
         originator_id=uuid.uuid4(),
@@ -60,15 +60,15 @@ def test_when_cipher_is_provided_it_should_decrypt_the_state_on_store_event(json
         timestamp=datetime.now(),
     )
     mapper = Mapper(cipher=Cipher(SECRET_KEY), transcoder=json_transcoder)
-    stored_event = mapper.from_domain_event(original_domain_event)
+    stored_event = mapper.from_event(original_event)
     assert b'Steve Magal' not in stored_event.state
-    domain_event: BankAccount.Opened = mapper.to_domain_event(stored_event)
-    assert domain_event.full_name == original_domain_event.full_name
-    assert domain_event.email_address == original_domain_event.email_address
+    event: BankAccount.Opened = mapper.to_event(stored_event)
+    assert event.full_name == original_event.full_name
+    assert event.email_address == original_event.email_address
 
 
 def test_when_cipher_is_not_provided_it_should_not_encrypt_the_state_on_store_event(json_transcoder):
-    domain_event = BankAccount.Opened(
+    event = BankAccount.Opened(
         full_name='Steve Magal',
         email_address='steve.magal@irmaodojorel.com',
         originator_id=uuid.uuid4(),
@@ -77,7 +77,7 @@ def test_when_cipher_is_not_provided_it_should_not_encrypt_the_state_on_store_ev
         timestamp=datetime.now(),
     )
     mapper = Mapper(transcoder=json_transcoder)
-    stored_event = mapper.from_domain_event(domain_event)
+    stored_event = mapper.from_event(event)
     assert b'full_name' in stored_event.state
     assert b'Steve Magal' in stored_event.state
     assert b'email_address' in stored_event.state
@@ -85,7 +85,7 @@ def test_when_cipher_is_not_provided_it_should_not_encrypt_the_state_on_store_ev
 
 
 def test_when_compressor_is_provided_it_should_compress_the_state_on_store_event(json_transcoder):
-    domain_event = BankAccount.Opened(
+    event = BankAccount.Opened(
         full_name='Steve Magal',
         email_address='steve.magal@irmaodojorel.com',
         originator_id=uuid.uuid4(),
@@ -94,16 +94,16 @@ def test_when_compressor_is_provided_it_should_compress_the_state_on_store_event
         timestamp=datetime.now(),
     )
     mapper = Mapper(transcoder=json_transcoder)
-    stored_event = mapper.from_domain_event(domain_event)
+    stored_event = mapper.from_event(event)
 
     mapper_with_compressor = Mapper(compressor=zlib, transcoder=json_transcoder)
-    compressed_stored_event = mapper_with_compressor.from_domain_event(domain_event)
+    compressed_stored_event = mapper_with_compressor.from_event(event)
 
     assert len(compressed_stored_event.state) < len(stored_event.state)
 
 
 def test_it_should_decompress_the_state_on_store_event(json_transcoder):
-    original_domain_event = BankAccount.Opened(
+    original_event = BankAccount.Opened(
         full_name='Steve Magal',
         email_address='steve.magal@irmaodojorel.com',
         originator_id=uuid.uuid4(),
@@ -112,7 +112,26 @@ def test_it_should_decompress_the_state_on_store_event(json_transcoder):
         timestamp=datetime.now(),
     )
     mapper = Mapper(compressor=zlib, transcoder=json_transcoder)
-    stored_event = mapper.from_domain_event(original_domain_event)
-    domain_event: BankAccount.Opened = mapper.to_domain_event(stored_event)
-    assert domain_event.full_name == original_domain_event.full_name
-    assert domain_event.email_address == original_domain_event.email_address
+    stored_event = mapper.from_event(original_event)
+    event: BankAccount.Opened = mapper.to_event(stored_event)
+    assert event.full_name == original_event.full_name
+    assert event.email_address == original_event.email_address
+
+
+def test_it_should_compress_and_encrypt_the_state_on_store_event(json_transcoder):
+    original_event = BankAccount.Opened(
+        full_name='Steve Magal',
+        email_address='steve.magal@irmaodojorel.com',
+        originator_id=uuid.uuid4(),
+        originator_version=1,
+        originator_topic='dummy_value',
+        timestamp=datetime.now(),
+    )
+    mapper = Mapper(cipher=Cipher(SECRET_KEY), transcoder=json_transcoder)
+    not_compressed_encrypted_stored_event = mapper.from_event(original_event)
+
+    mapper = Mapper(cipher=Cipher(SECRET_KEY), compressor=zlib, transcoder=json_transcoder)
+    compressed_encrypted_stored_event = mapper.from_event(original_event)
+
+    assert b'Steve Magal' not in compressed_encrypted_stored_event.state
+    assert len(compressed_encrypted_stored_event.state) < len(not_compressed_encrypted_stored_event.state)

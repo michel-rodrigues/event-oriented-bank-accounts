@@ -1,6 +1,7 @@
 import uuid
 from collections import defaultdict
 from threading import Lock
+from typing import Sequence
 
 from src.patterns.domain_model.mapper import StoredEvent
 from src.patterns.domain_model.recorder import AggregateRecorder
@@ -8,25 +9,25 @@ from src.patterns.domain_model.recorder import AggregateRecorder
 
 class InMemoryAggregateRecorder(AggregateRecorder):
     def __init__(self):
-        self.stored_events: list[StoredEvent] = []
-        self.stored_events_index: dict[uuid.UUID, dict[int, int]] = defaultdict(dict)
-        self.database_lock = Lock()
+        self._stored_events: list[StoredEvent] = []
+        self._stored_events_index: dict[uuid.UUID, dict[int, int]] = defaultdict(dict)
+        self._database_lock = Lock()
 
-    def insert_events(self, stored_events: list[StoredEvent], **kwargs) -> None:
-        with self.database_lock:
-            self.assert_uniqueness(stored_events, **kwargs)
-            self.update_table(stored_events, **kwargs)
+    def insert_events(self, stored_events: Sequence[StoredEvent], **kwargs) -> None:
+        with self._database_lock:
+            self._assert_uniqueness(stored_events, **kwargs)
+            self._update_table(stored_events, **kwargs)
 
-    def assert_uniqueness(self, stored_events: list[StoredEvent], **kwargs) -> None:
+    def _assert_uniqueness(self, stored_events: list[StoredEvent], **kwargs) -> None:
         for stored_event in stored_events:
-            if stored_event.originator_version in self.stored_events_index[stored_event.originator_id]:
+            if stored_event.originator_version in self._stored_events_index[stored_event.originator_id]:
                 raise self.IntegrityError
 
-    def update_table(self, stored_events: list[StoredEvent], **kwargs) -> None:
+    def _update_table(self, stored_events: list[StoredEvent], **kwargs) -> None:
         for stored_event in stored_events:
-            self.stored_events.append(stored_event)
-            self.stored_events_index[stored_event.originator_id][stored_event.originator_version] = (
-                len(self.stored_events) - 1
+            self._stored_events.append(stored_event)
+            self._stored_events_index[stored_event.originator_id][stored_event.originator_version] = (
+                len(self._stored_events) - 1
             )
 
     def select_events(
@@ -36,10 +37,10 @@ class InMemoryAggregateRecorder(AggregateRecorder):
         lte: int = None,
         desc: bool = False,
         limit: int = None,
-    ) -> list[StoredEvent]:
-        with self.database_lock:
+    ) -> Sequence[StoredEvent]:
+        with self._database_lock:
             results = []
-            index = self.stored_events_index[originator_id]
+            index = self._stored_events_index[originator_id]
             positions = index.keys()
             if desc:
                 positions = reversed(list(positions))
@@ -48,7 +49,7 @@ class InMemoryAggregateRecorder(AggregateRecorder):
                     continue
                 if lte and not position <= lte:
                     continue
-                stored_event = self.stored_events[index[position]]
+                stored_event = self._stored_events[index[position]]
                 results.append(stored_event)
                 if len(results) == limit:
                     break

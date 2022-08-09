@@ -1,6 +1,7 @@
 import os
 import threading
 import uuid
+from typing import Sequence
 
 import psycopg2
 from psycopg2.extensions import connection, cursor
@@ -78,14 +79,14 @@ class PostgresAggregateRecorder(AggregateRecorder):
         except psycopg2.OperationalError as error:
             raise self.OperationalError(error) from error
 
-    def insert_events(self, stored_events, **kwargs):
-        with self._db.transaction() as c:
-            self._insert_events(c, stored_events, **kwargs)
+    def insert_events(self, stored_events: Sequence[StoredEvent], **kwargs):
+        with self._db.transaction() as cursor:
+            self._insert_events(cursor, stored_events, **kwargs)
 
     def _build_row(self, stored_event: StoredEvent) -> tuple:
         return stored_event.originator_id.hex, stored_event.originator_version, stored_event.topic, stored_event.state
 
-    def _insert_events(self, cursor: cursor, stored_events: list[StoredEvent], **kwargs) -> None:
+    def _insert_events(self, cursor: cursor, stored_events: Sequence[StoredEvent], **kwargs) -> None:
         params = (self._build_row(stored_event) for stored_event in stored_events)
         try:
             cursor.executemany(f'INSERT INTO {self._events_table} VALUES (%s, %s, %s, %s)', params)
@@ -107,7 +108,7 @@ class PostgresAggregateRecorder(AggregateRecorder):
         lte: int = None,
         desc: bool = False,
         limit: int = None,
-    ) -> list[StoredEvent]:
+    ) -> Sequence[StoredEvent]:
         statement = f'SELECT * FROM {self._events_table} WHERE originator_id = %s'
         params = [originator_id.hex]
         if gt:

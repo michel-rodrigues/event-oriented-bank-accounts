@@ -2,6 +2,7 @@ import importlib
 import uuid
 from copy import deepcopy
 from datetime import datetime
+from typing import Sequence
 
 from src.patterns.domain_model.domain_event import DomainEvent
 
@@ -45,25 +46,6 @@ class Aggregate:
         self.modified_on = timestamp
         self.pending_events: list[Aggregate.Event] = []
 
-    @classmethod
-    def _create_(cls, event_class: 'Aggregate.Created', **kwargs):
-        """Factory method to construct a new aggregate object instance."""
-        # Construct the domain event class, with an ID and version, and the
-        # a topic for the aggregate class.
-        event = event_class(
-            originator_id=uuid.uuid4(),
-            originator_version=1,
-            originator_topic=get_topic(cls),
-            timestamp=datetime.now(),
-            **kwargs,
-        )
-        # Construct the aggregate object.
-        aggregate = event.mutate(None)
-        # Append the domain event to pending list.
-        aggregate.pending_events.append(event)
-        # Return the aggregate.
-        return aggregate
-
     class Created(Event):
         """Domain event for when aggregate is created."""
 
@@ -83,14 +65,33 @@ class Aggregate:
             # Construct and return aggregate object.
             return aggregate_class(id=id, version=version, **kwargs)
 
-    def _trigger_(self, event_class: 'Aggregate.Event', **kwargs) -> None:
+    @classmethod
+    def _create_(cls, created_event_class: Created, **kwargs):
+        """Factory method to construct a new aggregate object instance."""
+        # Construct the domain event class, with an ID and version, and the
+        # a topic for the aggregate class.
+        event: Aggregate.Created = created_event_class(
+            originator_id=uuid.uuid4(),
+            originator_version=1,
+            originator_topic=get_topic(cls),
+            timestamp=datetime.now(),
+            **kwargs,
+        )
+        # Construct the aggregate object.
+        aggregate = event.mutate(None)
+        # Append the domain event to pending list.
+        aggregate.pending_events.append(event)
+        # Return the aggregate.
+        return aggregate
+
+    def _trigger_(self, event_class: Event, **kwargs) -> None:
         """Triggers domain event of given type, extending the sequence of
         domain events for this aggregate object.
         """
         # Construct the domain event as the next in the aggregate's sequence.
         # Use counting to generate the sequence.
         next_version = self.version + 1
-        event = event_class(
+        event: Aggregate.Event = event_class(
             originator_id=self.id,
             originator_version=next_version,
             timestamp=datetime.now(),
@@ -101,7 +102,7 @@ class Aggregate:
         # Append the domain event to pending list.
         self.pending_events.append(event)
 
-    def _collect_(self) -> list[Event]:
+    def _collect_(self) -> Sequence[Event]:
         """Collects pending events."""
         return self.pending_events
 

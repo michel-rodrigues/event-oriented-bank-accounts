@@ -1,6 +1,7 @@
 import sqlite3
 import threading
 import uuid
+from typing import Sequence
 
 from src.patterns.domain_model.recorder import AggregateRecorder, StoredEvent
 
@@ -86,14 +87,14 @@ class SQLiteAggregateRecorder(AggregateRecorder):
         except sqlite3.OperationalError as error:
             raise self.OperationalError(error)
 
-    def insert_events(self, stored_events, **kwargs):
+    def insert_events(self, stored_events: Sequence[StoredEvent], **kwargs):
         with self._db.transaction() as connection:
             self._insert_events(connection, stored_events, **kwargs)
 
     def _build_row(self, stored_event: StoredEvent) -> tuple:
         return stored_event.originator_id.hex, stored_event.originator_version, stored_event.topic, stored_event.state
 
-    def _insert_events(self, connection: sqlite3.Connection, stored_events: list[StoredEvent], **kwargs) -> None:
+    def _insert_events(self, connection: sqlite3.Connection, stored_events: Sequence[StoredEvent], **kwargs) -> None:
         params = (self._build_row(stored_event) for stored_event in stored_events)
         try:
             connection.executemany(f'INSERT INTO {self._table_name} VALUES (?,?,?,?)', params)
@@ -115,7 +116,7 @@ class SQLiteAggregateRecorder(AggregateRecorder):
         lte: int = None,
         desc: bool = False,
         limit: int = None,
-    ) -> list[StoredEvent]:
+    ) -> Sequence[StoredEvent]:
         statement = f'SELECT * FROM {self._table_name} WHERE originator_id=?'
         params = [originator_id.hex]
         if gt:

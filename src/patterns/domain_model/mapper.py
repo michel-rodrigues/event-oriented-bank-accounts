@@ -3,8 +3,8 @@ import uuid
 from copy import deepcopy
 from typing import Any, Union
 
-from src.patterns.domain_model import DomainEvent, ImmutableObject
-from src.patterns.domain_model.aggregate import get_topic, resolve_topic
+from src.patterns.domain_model import ImmutableObject
+from src.patterns.domain_model.aggregate import Aggregate, get_topic, resolve_topic
 
 
 class AbstractTranscoder(abc.ABC):
@@ -75,34 +75,34 @@ class Mapper:
         self._compressor = compressor
         self._cipher = cipher
 
-    def from_domain_event(self, domain_event: DomainEvent) -> StoredEvent:
-        topic: str = get_topic(domain_event.__class__)
-        domain_event_data = deepcopy(vars(domain_event))
-        domain_event_data.pop('originator_id')
-        domain_event_data.pop('originator_version')
-        state: bytes = self._transcoder.encode(domain_event_data)
+    def from_event(self, event: Aggregate.Event) -> StoredEvent:
+        topic: str = get_topic(event.__class__)
+        event_data = deepcopy(vars(event))
+        event_data.pop('originator_id')
+        event_data.pop('originator_version')
+        state: bytes = self._transcoder.encode(event_data)
         if self._compressor:
             state = self._compressor.compress(state)
         if self._cipher:
             state = self._cipher.encrypt(state)
         return StoredEvent(
-            originator_id=domain_event.originator_id,
-            originator_version=domain_event.originator_version,
+            originator_id=event.originator_id,
+            originator_version=event.originator_version,
             topic=topic,
             state=state,
         )
 
-    def to_domain_event(self, stored: StoredEvent) -> DomainEvent:
+    def to_event(self, stored: StoredEvent) -> Aggregate.Event:
         state: bytes = stored.state
         if self._cipher:
             state = self._cipher.decrypt(state)
         if self._compressor:
             state = self._compressor.decompress(state)
-        domain_event_data = self._transcoder.decode(state)
-        domain_event_data['originator_id'] = stored.originator_id
-        domain_event_data['originator_version'] = stored.originator_version
+        event_data = self._transcoder.decode(state)
+        event_data['originator_id'] = stored.originator_id
+        event_data['originator_version'] = stored.originator_version
         cls = resolve_topic(stored.topic)
-        assert issubclass(cls, DomainEvent)
-        domain_event: DomainEvent = object.__new__(cls)
-        vars(domain_event).update(domain_event_data)
-        return domain_event
+        assert issubclass(cls, Aggregate.Event)
+        event: Aggregate.Event = object.__new__(cls)
+        vars(event).update(event_data)
+        return event
