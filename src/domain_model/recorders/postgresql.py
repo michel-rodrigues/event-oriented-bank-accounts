@@ -72,7 +72,7 @@ class PostgresAggregateRecorder(AggregateRecorder):
             'PRIMARY KEY (originator_id, originator_version));'
             # Don't truncate the table in production,
             # this line is just to keep testing independent
-            f'TRUNCATE TABLE {self._events_table};'
+            f'TRUNCATE TABLE {self._events_table} RESTART IDENTITY;'
         )
         try:
             cursor.execute(statement)
