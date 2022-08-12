@@ -12,7 +12,7 @@ class Notification(StoredEvent):
 class ApplicationRecorder(AggregateRecorder):
     @abc.abstractmethod
     def select_notifications(self, start: int, limit: int) -> Sequence[Notification]:
-        """Returns a list of event notifications from 'start',
+        """Returns a sequence of event notifications from 'start',
         limited by 'limit'.
         """
 
