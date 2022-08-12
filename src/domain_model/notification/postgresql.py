@@ -12,7 +12,7 @@ class PostgresApplicationRecorder(ApplicationRecorder, PostgresAggregateRecorder
     def _create_table(self, cursor: cursor):
         super()._create_table(cursor)
         statement = (
-            f'ALTER TABLE {self._events_table} '
+            f'ALTER TABLE {self._table_name} '
             'ADD COLUMN IF NOT EXISTS '
             f'rowid SERIAL'  # fmt: skip
         )
@@ -22,7 +22,7 @@ class PostgresApplicationRecorder(ApplicationRecorder, PostgresAggregateRecorder
             raise self.OperationalError(error) from error
         statement = (
             'CREATE UNIQUE INDEX IF NOT EXISTS rowid_idx '
-            f'ON {self._events_table} (rowid ASC);'  # fmt: skip
+            f'ON {self._table_name} (rowid ASC);'  # fmt: skip
         )
         try:
             cursor.execute(statement)
@@ -44,7 +44,7 @@ class PostgresApplicationRecorder(ApplicationRecorder, PostgresAggregateRecorder
         """
         statement = (
             'SELECT * '
-            f'FROM {self._events_table} '
+            f'FROM {self._table_name} '
             'WHERE rowid>=%s '
             'ORDER BY rowid '
             'LIMIT %s'  # fmt: skip
@@ -56,6 +56,6 @@ class PostgresApplicationRecorder(ApplicationRecorder, PostgresAggregateRecorder
     def max_notification_id(self) -> int:
         """Returns the maximum notification ID."""
         cursor = self._db.get_connection().cursor()
-        statement = f'SELECT MAX(rowid) FROM {self._events_table}'
+        statement = f'SELECT MAX(rowid) FROM {self._table_name}'
         cursor.execute(statement)
         return cursor.fetchone()[0] or 0

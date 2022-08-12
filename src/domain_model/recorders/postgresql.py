@@ -52,10 +52,9 @@ class PostgresDatabase:
 
 
 class PostgresAggregateRecorder(AggregateRecorder):
-    def __init__(self, application_name: str = ''):
+    def __init__(self, table_name: str = 'stored_events'):
         self._db = PostgresDatabase()
-        self._application_name = application_name
-        self._events_table = application_name.lower() + 'events'
+        self._table_name = table_name
 
     def create_table(self):
         with self._db.transaction() as cursor:
@@ -64,7 +63,7 @@ class PostgresAggregateRecorder(AggregateRecorder):
     def _create_table(self, cursor: cursor):
         statement = (
             'CREATE TABLE IF NOT EXISTS '
-            f'{self._events_table} ('
+            f'{self._table_name} ('
             'originator_id uuid NOT NULL, '
             'originator_version integer NOT NULL, '
             'topic text, '
@@ -72,7 +71,7 @@ class PostgresAggregateRecorder(AggregateRecorder):
             'PRIMARY KEY (originator_id, originator_version));'
             # Don't truncate the table in production,
             # this line is just to keep testing independent
-            f'TRUNCATE TABLE {self._events_table} RESTART IDENTITY;'
+            f'TRUNCATE TABLE {self._table_name} RESTART IDENTITY;'
         )
         try:
             cursor.execute(statement)
@@ -89,7 +88,7 @@ class PostgresAggregateRecorder(AggregateRecorder):
     def _insert_events(self, cursor: cursor, stored_events: Sequence[StoredEvent], **kwargs) -> None:
         params = (self._build_row(stored_event) for stored_event in stored_events)
         try:
-            cursor.executemany(f'INSERT INTO {self._events_table} VALUES (%s, %s, %s, %s)', params)
+            cursor.executemany(f'INSERT INTO {self._table_name} VALUES (%s, %s, %s, %s)', params)
         except psycopg2.IntegrityError as error:
             raise self.IntegrityError(error) from error
 
@@ -109,7 +108,7 @@ class PostgresAggregateRecorder(AggregateRecorder):
         desc: bool = False,
         limit: int = None,
     ) -> Sequence[StoredEvent]:
-        statement = f'SELECT * FROM {self._events_table} WHERE originator_id = %s'
+        statement = f'SELECT * FROM {self._table_name} WHERE originator_id = %s'
         params = [originator_id.hex]
         if gt:
             statement += ' AND originator_version > %s'
