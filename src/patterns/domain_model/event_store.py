@@ -33,4 +33,4 @@ class EventStore:
             desc=desc,
             limit=limit,
         )
-        return iter(self._mapper.to_event(stored_event) for stored_event in stored_events)
+        return (self._mapper.to_event(stored_event) for stored_event in stored_events)
