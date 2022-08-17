@@ -2,7 +2,7 @@ import uuid
 
 from src.application.notification_log import LocalNotificationLog
 from src.domain_model.notification.in_memory import InMemoryApplicationRecorder
-from src.patterns.domain_model.mapper import StoredEvent
+from src.patterns.domain_model_layer.mapper import StoredEvent
 
 
 def test_it_should_return_an_empty_section_when_there_is_no_stored_events():

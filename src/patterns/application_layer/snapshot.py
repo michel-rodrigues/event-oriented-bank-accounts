@@ -1,7 +1,7 @@
 from copy import deepcopy
 from datetime import datetime
 
-from src.patterns.domain_model.aggregate import Aggregate, get_topic, resolve_topic
+from src.patterns.domain_model_layer.aggregate import Aggregate, get_topic, resolve_topic
 
 
 class Snapshot(Aggregate.Event):

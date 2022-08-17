@@ -2,9 +2,9 @@ import uuid
 
 import pytest
 
-from src.domain_model.recorders import SQLiteAggregateRecorder
-from src.patterns.domain_model.mapper import StoredEvent
-from src.patterns.domain_model.recorder import Recorder
+from src.domain_model.recorders.sqlite import SQLiteAggregateRecorder
+from src.patterns.domain_model_layer.mapper import StoredEvent
+from src.patterns.domain_model_layer.recorder import Recorder
 
 
 def test_record_events_and_retrieve_ordered_by_version():

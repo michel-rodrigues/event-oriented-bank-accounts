@@ -1,7 +1,7 @@
 import uuid
 
 from src.domain_model.notification.postgresql import PostgresApplicationRecorder
-from src.patterns.domain_model.mapper import StoredEvent
+from src.patterns.domain_model_layer.mapper import StoredEvent
 
 
 def test_it_should_write_the_stored_events():

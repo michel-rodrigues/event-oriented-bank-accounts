@@ -1,8 +1,8 @@
 import abc
 from typing import Sequence
 
-from src.patterns.domain_model.domain_event import ImmutableObject
-from src.patterns.domain_model.notification import Notification
+from src.patterns.domain_model_layer.domain_event import ImmutableObject
+from src.patterns.domain_model_layer.notification import Notification
 
 
 def format_section_id(first, limit):

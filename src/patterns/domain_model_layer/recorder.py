@@ -2,7 +2,7 @@ import abc
 import uuid
 from typing import Sequence
 
-from src.patterns.domain_model.mapper import StoredEvent
+from src.patterns.domain_model_layer.mapper import StoredEvent
 
 
 class Recorder(abc.ABC):

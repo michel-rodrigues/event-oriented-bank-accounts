@@ -1,9 +1,9 @@
 import uuid
 from typing import Iterator, Sequence
 
-from src.patterns.domain_model.aggregate import Aggregate
-from src.patterns.domain_model.mapper import Mapper
-from src.patterns.domain_model.recorder import AggregateRecorder
+from src.patterns.domain_model_layer.aggregate import Aggregate
+from src.patterns.domain_model_layer.mapper import Mapper
+from src.patterns.domain_model_layer.recorder import AggregateRecorder
 
 
 class EventStore:

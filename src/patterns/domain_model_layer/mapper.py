@@ -3,8 +3,8 @@ import uuid
 from copy import deepcopy
 from typing import Any, Union
 
-from src.patterns.domain_model import ImmutableObject
-from src.patterns.domain_model.aggregate import Aggregate, get_topic, resolve_topic
+from src.patterns.domain_model_layer.aggregate import Aggregate, get_topic, resolve_topic
+from src.patterns.domain_model_layer.domain_event import ImmutableObject
 
 
 class AbstractTranscoder(abc.ABC):
@@ -82,7 +82,9 @@ class Mapper:
         event_data.pop('originator_version')
         state: bytes = self._transcoder.encode(event_data)
         if self._compressor:
+            print(len(state))
             state = self._compressor.compress(state)
+            print(len(state))
         if self._cipher:
             state = self._cipher.encrypt(state)
         return StoredEvent(

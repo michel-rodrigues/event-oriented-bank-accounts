@@ -2,7 +2,7 @@ import uuid
 from typing import Sequence
 
 from src.domain_model.recorders.sqlite import SQLiteAggregateRecorder
-from src.patterns.domain_model.notification import ApplicationRecorder, Notification
+from src.patterns.domain_model_layer.notification import ApplicationRecorder, Notification
 
 
 class SQLiteApplicationRecorder(ApplicationRecorder, SQLiteAggregateRecorder):

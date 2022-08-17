@@ -3,10 +3,10 @@ from decimal import Decimal
 
 from src.domain_model.aggregate import BankAccount
 from src.domain_model.mapper.cipher import SECRET_KEY, Cipher
-from src.domain_model.recorders import PostgresAggregateRecorder
-from src.patterns.application.snapshot import Snapshot
-from src.patterns.domain_model.event_store import EventStore
-from src.patterns.domain_model.mapper import Mapper
+from src.domain_model.recorders.postgresql import PostgresAggregateRecorder
+from src.patterns.application_layer.snapshot import Snapshot
+from src.patterns.domain_model_layer.event_store import EventStore
+from src.patterns.domain_model_layer.mapper import Mapper
 
 
 def test_take_a_snapshot_of_the_current_aggregate_state(json_transcoder):

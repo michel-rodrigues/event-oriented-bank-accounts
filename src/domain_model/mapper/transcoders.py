@@ -1,7 +1,7 @@
 import json
 from typing import Any, Union
 
-from src.patterns.domain_model.mapper import AbstractTranscoder, AbstractTranscoding
+from src.patterns.domain_model_layer.mapper import AbstractTranscoder, AbstractTranscoding
 
 
 class JSONTranscoder(AbstractTranscoder):

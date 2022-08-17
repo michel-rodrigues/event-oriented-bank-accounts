@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Union
 
-from src.patterns.domain_model.mapper import AbstractTranscoding
+from src.patterns.domain_model_layer.mapper import AbstractTranscoding
 
 
 class UUIDAsHex(AbstractTranscoding):

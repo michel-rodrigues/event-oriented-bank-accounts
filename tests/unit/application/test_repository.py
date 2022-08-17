@@ -7,10 +7,10 @@ import pytest
 from src.domain_model.aggregate import BankAccount
 from src.domain_model.mapper.cipher import SECRET_KEY, Cipher
 from src.domain_model.recorders.in_memory import InMemoryAggregateRecorder
-from src.patterns.application.repository import AggregateNotFoundError, Repository
-from src.patterns.application.snapshot import Snapshot
-from src.patterns.domain_model.event_store import EventStore
-from src.patterns.domain_model.mapper import Mapper
+from src.patterns.application_layer.repository import Repository
+from src.patterns.application_layer.snapshot import Snapshot
+from src.patterns.domain_model_layer.event_store import EventStore
+from src.patterns.domain_model_layer.mapper import Mapper
 
 
 def test_it_should_project_the_state_from_stored_events(json_transcoder):
@@ -131,5 +131,5 @@ def test_it_should_raise_an_error_when_there_is_no_stored_event_related_to_the_a
         recorder=InMemoryAggregateRecorder(),
     )
     repository = Repository(event_store, snapshot_store)
-    with pytest.raises(AggregateNotFoundError):
+    with pytest.raises(Repository.AggregateNotFoundError):
         repository.get(uuid.uuid4())

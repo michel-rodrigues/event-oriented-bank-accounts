@@ -3,7 +3,7 @@ import threading
 import uuid
 from typing import Sequence
 
-from src.patterns.domain_model.recorder import AggregateRecorder, StoredEvent
+from src.patterns.domain_model_layer.recorder import AggregateRecorder, StoredEvent
 
 
 class SQLiteDatabase:
@@ -56,8 +56,8 @@ class SQLiteDatabase:
 
 
 class SQLiteAggregateRecorder(AggregateRecorder):
-    def __init__(self, table_name: str = 'stored_events'):
-        self._db = SQLiteDatabase(':memory:')
+    def __init__(self, table_name: str = 'stored_events', db: SQLiteDatabase = None):
+        self._db = db or SQLiteDatabase(':memory:')
         self._table_name = table_name
 
     def create_table(self):

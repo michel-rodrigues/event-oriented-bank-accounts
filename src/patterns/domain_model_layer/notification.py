@@ -1,8 +1,8 @@
 import abc
 from typing import Sequence
 
-from src.patterns.domain_model.mapper import StoredEvent
-from src.patterns.domain_model.recorder import AggregateRecorder
+from src.patterns.domain_model_layer.mapper import StoredEvent
+from src.patterns.domain_model_layer.recorder import AggregateRecorder
 
 
 class Notification(StoredEvent):

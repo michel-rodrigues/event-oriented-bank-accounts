@@ -4,7 +4,7 @@ from copy import deepcopy
 from datetime import datetime
 from typing import Sequence
 
-from src.patterns.domain_model.domain_event import DomainEvent
+from src.patterns.domain_model_layer.domain_event import DomainEvent
 
 
 class Aggregate:

@@ -1,9 +1,9 @@
 import uuid
 from typing import Union
 
-from src.patterns.application.snapshot import Snapshot
-from src.patterns.domain_model.aggregate import Aggregate
-from src.patterns.domain_model.event_store import EventStore
+from src.patterns.application_layer.snapshot import Snapshot
+from src.patterns.domain_model_layer.aggregate import Aggregate
+from src.patterns.domain_model_layer.event_store import EventStore
 
 
 class Repository:
@@ -37,11 +37,10 @@ class Repository:
         aggregate = self._project(domain_events)
         # Raise exception if not found.
         if not aggregate:
-            raise AggregateNotFoundError
+            raise self.AggregateNotFoundError
         # Return the aggregate.
         assert isinstance(aggregate, Aggregate)
         return aggregate
 
-
-class AggregateNotFoundError(Exception):
-    pass
+    class AggregateNotFoundError(Exception):
+        pass

@@ -1,6 +1,6 @@
 from cryptography.fernet import Fernet
 
-from src.patterns.domain_model.mapper import AbstractCipher
+from src.patterns.domain_model_layer.mapper import AbstractCipher
 
 
 # This must be kept secret.

@@ -1,5 +1,5 @@
-from src.patterns.application.notification_log import AbstractNotificationLog, Section, format_section_id
-from src.patterns.domain_model.notification import ApplicationRecorder
+from src.patterns.application_layer.notification_log import AbstractNotificationLog, Section, format_section_id
+from src.patterns.domain_model_layer.notification import ApplicationRecorder
 
 
 class LocalNotificationLog(AbstractNotificationLog):

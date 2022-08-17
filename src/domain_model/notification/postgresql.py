@@ -5,7 +5,7 @@ import psycopg2
 from psycopg2.extensions import cursor
 
 from src.domain_model.recorders.postgresql import PostgresAggregateRecorder
-from src.patterns.domain_model.notification import ApplicationRecorder, Notification
+from src.patterns.domain_model_layer.notification import ApplicationRecorder, Notification
 
 
 class PostgresApplicationRecorder(ApplicationRecorder, PostgresAggregateRecorder):

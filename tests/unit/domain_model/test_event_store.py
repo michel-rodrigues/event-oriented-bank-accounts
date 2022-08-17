@@ -5,10 +5,10 @@ import pytest
 
 from src.domain_model.aggregate import BankAccount
 from src.domain_model.mapper.cipher import SECRET_KEY, Cipher
-from src.domain_model.recorders import InMemoryAggregateRecorder
-from src.patterns.domain_model.event_store import EventStore
-from src.patterns.domain_model.mapper import Mapper
-from src.patterns.domain_model.recorder import Recorder
+from src.domain_model.recorders.in_memory import InMemoryAggregateRecorder
+from src.patterns.domain_model_layer.event_store import EventStore
+from src.patterns.domain_model_layer.mapper import Mapper
+from src.patterns.domain_model_layer.recorder import Recorder
 
 
 def test_it_should_store_and_retrieve_the_events(json_transcoder):

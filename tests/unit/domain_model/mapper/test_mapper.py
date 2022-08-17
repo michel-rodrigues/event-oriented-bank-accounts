@@ -5,7 +5,7 @@ from decimal import Decimal
 
 from src.domain_model.aggregate import BankAccount
 from src.domain_model.mapper.cipher import SECRET_KEY, Cipher
-from src.patterns.domain_model.mapper import Mapper, StoredEvent
+from src.patterns.domain_model_layer.mapper import Mapper, StoredEvent
 
 
 def test_map_event_to_store_event(json_transcoder):

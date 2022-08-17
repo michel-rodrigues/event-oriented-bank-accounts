@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from src.patterns.domain_model import Aggregate
+from src.patterns.domain_model_layer.aggregate import Aggregate
 
 
 class BankAccount(Aggregate):
